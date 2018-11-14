@@ -1,0 +1,15 @@
+<p-tree
+  [style]="{'width':'20vw','height':'80vh'}"
+  [value]="rootPackages"
+  (onNodeExpand)="nodeExpand($event)"
+  selectionMode="checkbox"
+  [(selection)]="selectedNodes"
+  (onNodeSelect)="nodeSelect($event)"
+  (onNodeUnselect)="nodeSelect($event)"
+  [contextMenu]="cm"
+  [propagateSelectionUp]="false"
+  [propagateSelectionDown]="false"
+>
+</p-tree>
+
+<p-contextMenu #cm [model]="contextMenu"></p-contextMenu>

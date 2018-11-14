@@ -1,0 +1,36 @@
+
+::ng-deep .PACKAGE {
+  background-image: url("/assets/icons/package_obj_2x.png");
+  width: 32px;
+  height: 32px;
+}
+
+::ng-deep .CLASS {
+  background-image: url("/assets/icons/class_obj_2x.png");
+  width: 32px;
+  height: 32px;
+}
+
+::ng-deep .INTERFACE {
+  background-image: url("/assets/icons/int_obj_2x.png");
+  width: 32px;
+  height: 32px;
+}
+
+::ng-deep .ENUM {
+  background-image: url("/assets/icons/enum_obj_2x.png");
+  width: 32px;
+  height: 32px;
+}
+
+::ng-deep .LAMBDA {
+  background-image: url("/assets/icons/lambda_obj_2x.png");
+  width: 32px;
+  height: 32px;
+}
+
+::ng-deep .METHOD {
+  background-image: url("/assets/icons/methpub_obj_2x.png");
+  width: 32px;
+  height: 32px;
+}

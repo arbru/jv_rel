@@ -1,0 +1,44 @@
+<table>
+  <tr>
+    <th align="left" style="width: 100px;">Name</th>
+    <td align="left"><input id="input" type="text" size="30" pInputText [(ngModel)]="query.name"> </td>
+  </tr>
+  <tr>
+    <th align="left">Max Hops</th>
+    <td align="left"><p-spinner min="0" size="3" [(ngModel)]="query.maxHops"></p-spinner></td>
+  </tr>
+  <tr>
+    <th valign="top">Relation Filter</th>
+    <td>
+      <p-table [value]="query.relationFilter">
+          <ng-template pTemplate="header">
+              <tr>
+                  <th style="width: 80px;">Type</th>
+                  <th style="width: 50px;">Max Hops</th>
+                  <th style="width: 80px;">Direction</th>
+                  <th style="width: 50px;">Action</th>
+              </tr>
+          </ng-template>
+          <ng-template pTemplate="body" ngFor let-i="rowIndex" let-filter [ngForOf]="query.relationFilter">
+              <tr>
+                  <td>
+                    <p-dropdown (onChange)="onRelationTypeChange($event)" [options]="relationTypes" [(ngModel)]="filter.relationType" [showClear]="true" placeholder="Select a Relation"></p-dropdown>
+                  </td>
+                  <td><p-spinner min="0" size="2" [(ngModel)]="filter.maxHops"></p-spinner></td>
+                  <td><p-dropdown [options]="directions" [(ngModel)]="filter.direction" [showClear]="true" placeholder="Select a Direction"></p-dropdown></td>
+                  <td>
+                     <button type="text" (click)="removeFilter(i)" pButton icon="fa fa-remove" class="ui-button-raised" label="Remove"></button>
+                  </td>
+              </tr>
+          </ng-template>
+          <ng-template pTemplate="footer">
+             <tr>
+               <td colspan="4">
+                 <button type="text" (click)="addFilter($event)" pButton icon="fa fa-plus" label="Add Filter"></button>
+               </td>
+             </tr>
+         </ng-template>
+      </p-table>
+    </td>
+  </tr>
+</table>

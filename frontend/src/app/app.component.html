@@ -1,0 +1,22 @@
+
+<div class="header">
+  <p-menubar [model]="menu" [style]="{'height':'10vh'}">
+  </p-menubar>
+</div>
+<div class="navigation">
+  <app-tree-view (selectionChange)="onSelectionChange($event,'tree')" (triggerExecution)="onQueryExecution($event)"></app-tree-view>
+</div>
+<div class="content">
+  <app-vis-graph (selectionChange)="onSelectionChange($event,'graph')"></app-vis-graph>
+</div>
+<div class="footer">
+  Footer
+</div>
+
+
+<p-dialog header="Create Query" [(visible)]="displayQueryDialog" [contentStyle]="{'overflow':'visible'}" [width]="900" [modal]="true">
+     <app-query-dialog></app-query-dialog>
+     <p-footer>
+       <button type="text" (click)="processQuery($event)" pButton icon="fa fa-save" label="Save"></button>
+     </p-footer>
+</p-dialog>
