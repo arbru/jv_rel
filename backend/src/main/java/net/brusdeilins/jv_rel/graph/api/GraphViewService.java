@@ -1,9 +1,11 @@
 package net.brusdeilins.jv_rel.graph.api;
 
-import net.brusdeilins.jv_rel.graph.api.dao.JvrGraphDao;
+import net.brusdeilins.jv_rel.graph.api.dto.JvrGraphDto;
 
 public interface GraphViewService {
-    Iterable<JvrGraphDao> getGraphs();
+    Iterable<JvrGraphDto> getGraphs();
 
-    JvrGraphDao getGraph(String id);
+    JvrGraphDto getGraph(String id);
+    
+    void saveGraph(JvrGraphDto graph);
 }

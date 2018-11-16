@@ -1,5 +1,8 @@
 package net.brusdeilins.jv_rel;
 
+import static net.brusdeilins.jv_rel.graph.impl.Transformer.TO_ENTITY_VIEW;
+import static net.brusdeilins.jv_rel.graph.impl.Transformer.TO_RELATION_VIEW;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -14,14 +17,13 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import net.brusdeilins.jv_rel.core.api.GraphDatabase;
-import net.brusdeilins.jv_rel.core.api.dao.JvrEntityDao;
-import net.brusdeilins.jv_rel.core.api.dao.JvrRelationDao;
-import net.brusdeilins.jv_rel.core.api.dao.JvrRelationTypeDao;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrEntityViewDao;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrEntityViewId;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrGraphDao;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrRelationViewDao;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrRelationViewId;
+import net.brusdeilins.jv_rel.core.api.dto.JvrEntityDto;
+import net.brusdeilins.jv_rel.core.api.dto.JvrRelationDto;
+import net.brusdeilins.jv_rel.core.api.dto.JvrRelationTypeDto;
+import net.brusdeilins.jv_rel.graph.api.GraphViewService;
+import net.brusdeilins.jv_rel.graph.api.dto.JvrEntityViewDto;
+import net.brusdeilins.jv_rel.graph.api.dto.JvrGraphDto;
+import net.brusdeilins.jv_rel.graph.api.dto.JvrRelationViewDto;
 import net.brusdeilins.jv_rel.graph.impl.jpa.JvrGraphRepository;
 import net.brusdeilins.jv_rel.parser.Entity;
 import net.brusdeilins.jv_rel.parser.EntityType;
@@ -30,10 +32,8 @@ import net.brusdeilins.jv_rel.parser.GraphBuilder;
 import net.brusdeilins.jv_rel.parser.Relation;
 import net.brusdeilins.jv_rel.parser.RelationType;
 import net.brusdeilins.jv_rel.query.api.QueryService;
-import net.brusdeilins.jv_rel.query.api.dao.JvrDirection;
-import net.brusdeilins.jv_rel.query.api.dao.JvrQueryDao;
-import net.brusdeilins.jv_rel.query.api.dao.JvrRelationFilterDao;
-import net.brusdeilins.jv_rel.query.api.dao.JvrRelationFilterId;
+import net.brusdeilins.jv_rel.query.api.dto.JvrQueryDto;
+import net.brusdeilins.jv_rel.query.api.dto.JvrRelationFilterDto;
 import net.brusdeilins.jv_rel.query.impl.jpa.JvrQueryRepository;
 
 @SpringBootApplication
@@ -44,7 +44,7 @@ public class Application {
     }
 
     @Bean
-    public CommandLineRunner demo(GraphDatabase graphDatabase, JvrGraphRepository jgr, QueryService queryProcessor,
+    public CommandLineRunner demo(GraphDatabase graphDatabase, GraphViewService graphViewService, QueryService queryService, JvrGraphRepository jgr, QueryService queryProcessor,
             JvrQueryRepository jqr) {
         return (args) -> {
 
@@ -52,80 +52,67 @@ public class Application {
                 graphDatabase.createEntityType(entityType.name());
             }
 
-            Map<RelationType, JvrRelationTypeDao> relationTypeMap = Maps.newHashMap();
+            Map<RelationType, JvrRelationTypeDto> relationTypeMap = Maps.newHashMap();
             for (RelationType relationType : RelationType.values()) {
-                JvrRelationTypeDao rtd = graphDatabase.createRelationType(relationType.name());
+                JvrRelationTypeDto rtd = graphDatabase.createRelationType(relationType.name());
                 relationTypeMap.put(relationType, rtd);
             }
 
             GraphBuilder gb = new net.brusdeilins.jv_rel.parser.GraphBuilder();
             Graph g = gb.build(Lists.newArrayList("target/classes"), ArrayListMultimap.create());
-            Map<Entity, JvrEntityDao> entityMap = Maps.newHashMap();
+            Map<Entity, JvrEntityDto> entityMap = Maps.newHashMap();
             for (Entity entity : g.getEntities()) {
-                JvrEntityDao entityDao = graphDatabase.createEntity(entity.getId(), entity.getType().name(),
+                JvrEntityDto entityDto = graphDatabase.createEntity(entity.getId(), entity.getType().name(),
                         entity.getName(), entity.getQName());
-                entityMap.put(entity, entityDao);
+                entityMap.put(entity, entityDto);
             }
 
-            Map<Relation, JvrRelationDao> relationMap = Maps.newHashMap();
+            Map<Relation, JvrRelationDto> relationMap = Maps.newHashMap();
             for (Relation relation : g.getRelations()) {
-                JvrRelationDao relationDao = graphDatabase.createRelation(relation.getId(),
+                JvrRelationDto relationDto = graphDatabase.createRelation(relation.getId(),
                         relationTypeMap.get(relation.getType()), entityMap.get(relation.getSource()),
                         entityMap.get(relation.getTarget()));
-                relationMap.put(relation, relationDao);
+                relationMap.put(relation, relationDto);
             }
 
-            JvrGraphDao jgd = new JvrGraphDao();
+            JvrGraphDto jgd = new JvrGraphDto();
             jgd.setId("test_graph");
             jgd.setName("Test Graph");
-            Set<JvrEntityViewDao> jevds = Sets.newHashSet();
+            Set<JvrEntityViewDto> jevds = Sets.newHashSet();
             int cnt = 0;
             for (Entity entity : g.getEntities()) {
-                JvrEntityDao jed = entityMap.get(entity);
-                JvrEntityViewDao jevd = new JvrEntityViewDao();
-                JvrEntityViewId jevi = new JvrEntityViewId();
-                jevi.setGraph(jgd);
-                jevi.setEntity(jed);
-                jevd.setId(jevi);
+                JvrEntityViewDto jevd = TO_ENTITY_VIEW.apply(entityMap.get(entity));
                 jevd.setX(cnt++);
                 jevds.add(jevd);
             }
             jgd.setEntities(jevds);
 
-            Set<JvrRelationViewDao> jrvds = Sets.newHashSet();
-            for (Relation entity : g.getRelations()) {
-                JvrRelationDao jed = relationMap.get(entity);
-                JvrRelationViewDao jevd = new JvrRelationViewDao();
-                JvrRelationViewId jevi = new JvrRelationViewId();
-                jevi.setGraph(jgd);
-                jevi.setRelation(jed);
-                jevd.setId(jevi);
+            Set<JvrRelationViewDto> jrvds = Sets.newHashSet();
+            for (Relation relation : g.getRelations()) {
+                JvrRelationViewDto jevd = TO_RELATION_VIEW.apply(relationMap.get(relation));
                 jevd.setX(cnt++);
                 jrvds.add(jevd);
             }
             jgd.setRelations(jrvds);
 
-            jgr.save(jgd);
+            graphViewService.saveGraph(jgd);
 
-            JvrQueryDao jq = new JvrQueryDao();
+            JvrQueryDto jq = new JvrQueryDto();
             jq.setName("test_query");
             jq.setMaxHops(10);
-            JvrRelationFilterDao rf = new JvrRelationFilterDao();
-            JvrRelationFilterId rfid = new JvrRelationFilterId();
-            rfid.setQuery(jq);
-            rfid.setRelationType(relationTypeMap.get(RelationType.HAS_PACKAGE));
-            rf.setId(rfid);
-            rf.setDirection(JvrDirection.FORWARD);
+            JvrRelationFilterDto rf = new JvrRelationFilterDto();
+            rf.setRelationType("HAS_PACKAGE");
+            rf.setDirection("FORWARD");
             rf.setMaxHops(5);
             jq.setRelationFilter(Sets.newHashSet(rf));
 
-            jqr.save(jq);
+            queryService.saveQuery(jq);
 
-            Set<JvrEntityDao> toplevel = graphDatabase.findTopLevelPackages();
-            JvrGraphDao graph = queryProcessor.process(toplevel, "test_query");
+            Set<JvrEntityDto> toplevel = graphDatabase.findTopLevelPackages();
+            JvrGraphDto graph = queryProcessor.process(toplevel, "test_query");
             graph.setId("result_graph");
             graph.setName("result_graph");
-            jgr.save(graph);
+            graphViewService.saveGraph(graph);
         };
     }
 }

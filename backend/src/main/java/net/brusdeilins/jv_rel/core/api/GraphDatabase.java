@@ -5,33 +5,33 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import net.brusdeilins.jv_rel.core.api.dao.JvrEntityDao;
-import net.brusdeilins.jv_rel.core.api.dao.JvrEntityTypeDao;
-import net.brusdeilins.jv_rel.core.api.dao.JvrRelationDao;
-import net.brusdeilins.jv_rel.core.api.dao.JvrRelationTypeDao;
+import net.brusdeilins.jv_rel.core.api.dto.JvrEntityDto;
+import net.brusdeilins.jv_rel.core.api.dto.JvrEntityTypeDto;
+import net.brusdeilins.jv_rel.core.api.dto.JvrRelationDto;
+import net.brusdeilins.jv_rel.core.api.dto.JvrRelationTypeDto;
 
 @Service
 public interface GraphDatabase {
-    Iterable<JvrRelationTypeDao> getRelationTypes();
+    Iterable<JvrRelationTypeDto> getRelationTypes();
 
-    JvrEntityTypeDao createEntityType(String entityType);
+    JvrEntityTypeDto createEntityType(String entityType);
 
-    JvrRelationTypeDao createRelationType(String relationType);
+    JvrRelationTypeDto createRelationType(String relationType);
 
-    JvrRelationTypeDao getRelationType(String relationType);
+    JvrRelationTypeDto getRelationType(String relationType);
 
-    JvrEntityDao createEntity(String id, String type, String name, String qualifiedName);
+    JvrEntityDto createEntity(String id, String type, String name, String qualifiedName);
 
-    JvrRelationDao createRelation(String id, JvrRelationTypeDao type, JvrEntityDao source, JvrEntityDao target);
+    JvrRelationDto createRelation(String id, JvrRelationTypeDto type, JvrEntityDto source, JvrEntityDto target);
 
-    Optional<JvrEntityDao> getEntityById(String id);
+    Optional<JvrEntityDto> getEntityById(String id);
 
-    Set<JvrEntityDao> findTopLevelPackages();
+    Set<JvrEntityDto> findTopLevelPackages();
 
-    Set<JvrRelationDao> findTargetRelations(String sourceId);
+    Set<JvrRelationDto> findTargetRelations(String sourceId);
 
-    Set<JvrRelationDao> getRelations(String entityId);
+    Set<JvrRelationDto> getRelations(String entityId);
 
-    Iterable<JvrEntityDao> getEntities(Set<String> entityIds);
+    Iterable<JvrEntityDto> getEntities(Set<String> entityIds);
 
 }
