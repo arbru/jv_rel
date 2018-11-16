@@ -1,15 +1,21 @@
 package net.brusdeilins.jv_rel.query.impl;
 
+import static java.util.stream.Collectors.toSet;
+import static net.brusdeilins.jv_rel.query.impl.Transformer.TO_QUERY_DAO;
+import static net.brusdeilins.jv_rel.query.impl.Transformer.TO_QUERY_DTO;
+
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Sets;
+
 import net.brusdeilins.jv_rel.core.api.GraphDatabase;
-import net.brusdeilins.jv_rel.core.api.dao.JvrEntityDao;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrGraphDao;
+import net.brusdeilins.jv_rel.core.api.dto.JvrEntityDto;
+import net.brusdeilins.jv_rel.graph.api.dto.JvrGraphDto;
 import net.brusdeilins.jv_rel.query.api.QueryService;
-import net.brusdeilins.jv_rel.query.api.dao.JvrQueryDao;
+import net.brusdeilins.jv_rel.query.api.dto.JvrQueryDto;
 import net.brusdeilins.jv_rel.query.impl.jpa.JvrQueryRepository;
 
 @Component
@@ -22,26 +28,26 @@ public class QueryServiceImpl implements QueryService {
     private GraphDatabase graphDatabase;
 
     @Override
-    public JvrGraphDao process(Set<JvrEntityDao> startNodes, String query) {
-        JvrQueryDao queryDao = queryRepository.findById(query).get();
+    public JvrGraphDto process(Set<JvrEntityDto> startNodes, String query) {
+        JvrQueryDto queryDao = TO_QUERY_DTO.apply(queryRepository.findById(query).get());
         QueryProcessor qp = new QueryProcessor(queryDao, graphDatabase);
         qp.process(startNodes);
         return qp.getGraph();
     }
 
     @Override
-    public Iterable<JvrQueryDao> getQueries() {
-        return queryRepository.findAll();
+    public Iterable<JvrQueryDto> getQueries() {
+        return Sets.newHashSet(queryRepository.findAll()).stream().map(TO_QUERY_DTO).collect(toSet());
     }
 
     @Override
-    public JvrQueryDao getQuery(String id) {
-        return queryRepository.findById(id).get();
+    public JvrQueryDto getQuery(String id) {
+        return TO_QUERY_DTO.apply(queryRepository.findById(id).get());
     }
 
     @Override
-    public void saveQuery(JvrQueryDao query) {
-        queryRepository.save(query);
+    public void saveQuery(JvrQueryDto query) {
+        queryRepository.save(TO_QUERY_DAO.apply(query));
     }
 
 }

@@ -2,16 +2,16 @@ package net.brusdeilins.jv_rel.query.api;
 
 import java.util.Set;
 
-import net.brusdeilins.jv_rel.core.api.dao.JvrEntityDao;
-import net.brusdeilins.jv_rel.graph.api.dao.JvrGraphDao;
-import net.brusdeilins.jv_rel.query.api.dao.JvrQueryDao;
+import net.brusdeilins.jv_rel.core.api.dto.JvrEntityDto;
+import net.brusdeilins.jv_rel.graph.api.dto.JvrGraphDto;
+import net.brusdeilins.jv_rel.query.api.dto.JvrQueryDto;
 
 public interface QueryService {
-    JvrGraphDao process(Set<JvrEntityDao> startNodes, String queryId);
+    JvrGraphDto process(Set<JvrEntityDto> startNodes, String queryId);
 
-    Iterable<JvrQueryDao> getQueries();
+    Iterable<JvrQueryDto> getQueries();
 
-    JvrQueryDao getQuery(String id);
+    JvrQueryDto getQuery(String id);
 
-    void saveQuery(JvrQueryDao query);
+    void saveQuery(JvrQueryDto query);
 }

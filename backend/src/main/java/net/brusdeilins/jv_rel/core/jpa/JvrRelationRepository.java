@@ -6,7 +6,7 @@ import java.util.Set;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import net.brusdeilins.jv_rel.core.api.dao.JvrRelationDao;
+import net.brusdeilins.jv_rel.core.impl.dao.JvrRelationDao;
 
 public interface JvrRelationRepository extends CrudRepository<JvrRelationDao, String> {
     List<JvrRelationDao> findBySourceIdOrTargetId(String sourceId, String targetId);
